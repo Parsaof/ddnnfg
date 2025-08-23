@@ -1,0 +1,22 @@
+# Gradle / builds
+.gradle/
+build/
+run/
+out/
+classes/
+bin/
+
+# IntelliJ / IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs & dumps
+*.log
+*.log.*
+*.hprof
+
+# Libs locales (on garde le dossier mais pas les JARs par défaut)
+libs/
+!libs/.keep

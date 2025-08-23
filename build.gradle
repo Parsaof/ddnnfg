@@ -1,0 +1,79 @@
+// --- Charger ForgeGradle 5.1 via buildscript
+buildscript {
+    repositories {
+        maven { url = "https://maven.minecraftforge.net" }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:5.1.+"
+    }
+}
+
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+}
+
+// Activer le plugin ForgeGradle
+apply plugin: "net.minecraftforge.gradle"
+
+// ---- Coordonnées du mod
+group = "me.cepera.pokedollsreforged"
+version = "1.12.2-1.2.1"
+
+base { archivesName = "PokedollsReforged" }
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(8) } }
+
+// ---- Dépôts
+repositories {
+    maven { url = "https://maven.minecraftforge.net" }
+    mavenCentral()
+    flatDir { dirs "libs" } // Pixelmon local ici
+}
+
+// ---- Config ForgeGradle
+minecraft {
+    // mappings 1.12.2 (stable) ; tu peux mettre snapshot si tu préfères
+    mappings channel: "stable", version: "39-1.12"
+
+    runs {
+        client {
+            workingDirectory project.file("run")
+            mods { pokedollsreforged { source sourceSets.main } }
+        }
+        server {
+            workingDirectory project.file("run")
+            mods { pokedollsreforged { source sourceSets.main } }
+        }
+    }
+}
+
+// ---- Dépendances
+dependencies {
+    // Userdev 1.12.2
+    minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2860"
+
+    // Pixelmon local (sera déobfusqué par FG)
+    compileOnly fg.deobf(files("libs/Pixelmon-1.12.2-8.4.3-universal.jar"))
+}
+
+// ---- Compilation & ressources
+tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", "1.12.2"
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "mcmod.info"
+        expand "version": project.version, "mcversion": "1.12.2"
+    }
+    from(sourceSets.main.resources.srcDirs) { exclude "mcmod.info" }
+}
+
+// ---- Jar & reobf
+jar { manifest { attributes("ModSide": "BOTH") } }
+tasks.named("jar").configure { finalizedBy("reobfJar") }
