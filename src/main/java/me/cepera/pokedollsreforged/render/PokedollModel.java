@@ -15,45 +15,60 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraftforge.client.model.*;
 import net.minecraftforge.common.model.*;
 
-public class PokedollModel implements IModel
-{
+public class PokedollModel implements IModel {
     protected BlockPokedoll pokedoll;
     protected ResourceLocation texture;
     protected String model_str;
     protected ModelBlock model;
-    
+
     public PokedollModel(final BlockPokedoll pokedoll) {
         this.pokedoll = pokedoll;
         String pokName = pokedoll.getPokemon().name.toLowerCase();
         pokName = pokName.replace("-", "");
-        this.texture = new ResourceLocation("pokedollsreforged", "items/pokedolls/" + (pokedoll.isShiny() ? "shiny/" : "") + pokName + "_pokedoll");
-        this.model_str = ("{'parent':'pokedollsreforged:item/pokedoll','textures': {'layer0':'" + this.texture.toString() + "'}}").replaceAll("'", "\"");
+        this.texture = new ResourceLocation(
+                "pokedollsreforged",
+                "items/pokedolls/" + (pokedoll.isShiny() ? "shiny/" : "") + pokName + "_pokedoll"
+        );
+        this.model_str = ("{'parent':'pokedollsreforged:item/pokedoll','textures': {'layer0':'"
+                + this.texture.toString() + "'}}").replaceAll("'", "\"");
     }
-    
+
+    @Override
     public IModel retexture(final ImmutableMap<String, String> textures) {
-        return (IModel)new PokedollModel(this.pokedoll);
+        // on ignore les textures custom, même comportement qu'avant
+        return new PokedollModel(this.pokedoll);
     }
-    
+
+    @Override
     public IModel process(final ImmutableMap<String, String> customData) {
-        return (IModel)new PokedollModel(this.pokedoll);
+        // on ignore les données custom, même comportement qu'avant
+        return new PokedollModel(this.pokedoll);
     }
-    
+
+    @Override
     public Collection<ResourceLocation> getDependencies() {
-        return (Collection<ResourceLocation>)ImmutableList.of((Object)new ResourceLocation("pokedollsreforged:item/pokedoll"));
+        // Pas de cast en Object -> liste typée de ResourceLocation
+        return ImmutableList.of(new ResourceLocation("pokedollsreforged", "item/pokedoll"));
     }
-    
+
+    @Override
     public Collection<ResourceLocation> getTextures() {
-        final ImmutableSet.Builder<ResourceLocation> builder = (ImmutableSet.Builder<ResourceLocation>)ImmutableSet.builder();
-        builder.add((Object)this.texture);
-        return (Collection<ResourceLocation>)builder.build();
+        // Builder typé correctement
+        ImmutableSet.Builder<ResourceLocation> builder = ImmutableSet.builder();
+        builder.add(this.texture);
+        return builder.build();
     }
-    
-    public IBakedModel bake(final IModelState state, final VertexFormat format, final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+
+    @Override
+    public IBakedModel bake(final IModelState state,
+                            final VertexFormat format,
+                            final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         this.model = ModelBlock.deserialize(this.model_str);
-        return new ItemLayerModel(this.model).bake(state, format, (Function)bakedTextureGetter);
+        return new ItemLayerModel(this.model).bake(state, format, bakedTextureGetter);
     }
-    
+
+    @Override
     public IModelState getDefaultState() {
-        return (IModelState)TRSRTransformation.identity();
+        return TRSRTransformation.identity();
     }
 }

@@ -67,12 +67,15 @@ processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", "1.12.2"
 
-    from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
-        expand "version": project.version, "mcversion": "1.12.2"
+    // s'il y a plusieurs sources, ne garde qu'un exemplaire de chaque fichier
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    // n’ouvre/expanse que mcmod.info, le reste est copié tel quel automatiquement
+    filesMatching("mcmod.info") {
+        expand version: project.version, mcversion: "1.12.2"
     }
-    from(sourceSets.main.resources.srcDirs) { exclude "mcmod.info" }
 }
+
 
 // ---- Jar & reobf
 jar { manifest { attributes("ModSide": "BOTH") } }
