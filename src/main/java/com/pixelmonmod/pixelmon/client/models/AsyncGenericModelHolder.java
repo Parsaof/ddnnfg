@@ -1,21 +1,23 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\thoma\OneDrive\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-//
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings".
 //Decompiled by Procyon!
 
 package com.pixelmonmod.pixelmon.client.models;
 
-import net.minecraft.client.model.*;
-import com.pixelmonmod.pixelmon.client.models.blocks.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.*;
-import java.time.*;
-import java.util.concurrent.*;
+import net.minecraft.client.model.ModelBase;
+import com.pixelmonmod.pixelmon.client.models.blocks.GenericSmdModel;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.Entity;
 
-public class AsyncGenericModelHolder extends ModelHolder<ModelBase>
-{
+import java.time.Instant;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+public class AsyncGenericModelHolder extends ModelHolder<ModelBase> {
+
     public static final ModelBase DUMMY;
     private Future<GenericSmdModel> future;
-    private ResourceLocation resource;
+    private final ResourceLocation resource;
 
     public AsyncGenericModelHolder(final ResourceLocation model) {
         this.resource = model;
@@ -37,33 +39,29 @@ public class AsyncGenericModelHolder extends ModelHolder<ModelBase>
         }
 
         if (this.future == null) {
-            // Lancement du chargement asynchrone du modèle
+            // démarre le chargement asynchrone
             this.future = ResourceLoader.addTask((Callable<GenericSmdModel>) this::loadModel);
         }
 
         if (this.future.isDone()) {
             try {
+                // récupère le modèle SMD et l'utilise comme ModelBase
                 this.model = this.future.get();
                 PixelmonModelHolder.loadedHolders.add(this);
             } catch (InterruptedException e) {
-                // Ré-interrompre le thread puis tracer l'erreur
+                // restaure le flag d'interruption et rend le dummy pour ce tick
                 Thread.currentThread().interrupt();
-                e.printStackTrace();
             } catch (ExecutionException e) {
-                // Erreur dans la tâche de chargement
-                Throwable cause = e.getCause();
-                if (cause != null) {
-                    cause.printStackTrace();
-                } else {
-                    e.printStackTrace();
-                }
+                // log cause réelle
+                e.getCause().printStackTrace();
             } finally {
                 this.future = null;
             }
-            return this.model;
+            return this.model != null ? this.model : DUMMY;
         }
 
-        return AsyncGenericModelHolder.DUMMY;
+        // encore en chargement
+        return DUMMY;
     }
 
     public void clear() {
@@ -80,5 +78,6 @@ public class AsyncGenericModelHolder extends ModelHolder<ModelBase>
     }
 
     private static class DummyModel extends ModelBase {
+        // ModelBase a une implémentation vide de render() en 1.12, rien à ajouter ici
     }
 }

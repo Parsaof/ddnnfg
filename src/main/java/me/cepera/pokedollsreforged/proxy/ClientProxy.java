@@ -1,52 +1,46 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\thoma\OneDrive\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
+//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings".
 //Decompiled by Procyon!
 
 package me.cepera.pokedollsreforged.proxy;
 
-import net.minecraft.client.resources.*;
-import net.minecraft.util.*;
-import me.cepera.pokedollsreforged.blocks.*;
-import net.minecraft.block.*;
-import me.cepera.pokedollsreforged.render.*;
-import net.minecraftforge.fml.common.event.*;
-import me.cepera.pokedollsreforged.tiles.*;
-import com.pixelmonmod.pixelmon.client.render.tileEntities.*;
-import net.minecraftforge.fml.client.registry.*;
-import net.minecraft.client.renderer.tileentity.*;
-import me.cepera.pokedollsreforged.listeners.*;
-import net.minecraft.item.*;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraftforge.client.model.*;
-import me.cepera.pokedollsreforged.render.RenderTileEntityPokedollBridge;
-import java.util.*;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
+import me.cepera.pokedollsreforged.blocks.BlockPokedoll;
+import net.minecraft.block.Block;
+import me.cepera.pokedollsreforged.render.PokedollModel;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import me.cepera.pokedollsreforged.tiles.TileEntityPokedoll;
+import me.cepera.pokedollsreforged.render.RenderTileEntityPokedoll; // ✅ notre TESR direct
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import me.cepera.pokedollsreforged.listeners.RegistryListener;
+import net.minecraft.item.Item;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
+
     @Override
     public void preinit(final FMLPreInitializationEvent e) {
         super.preinit(e);
+
+        // Loader de modèles item pour les poupées
         ModelLoaderRegistry.registerLoader(new ICustomModelLoader() {
             @Override
-            public void onResourceManagerReload(final IResourceManager resourceManager) {
-            }
+            public void onResourceManagerReload(final IResourceManager resourceManager) {}
 
             @Override
             public IModel loadModel(final ResourceLocation modelLocation) throws Exception {
                 ResourceLocation loc = modelLocation;
-                loc = new ResourceLocation(
-                        loc.getNamespace(),
-                        loc.getPath().substring(
-                                (loc.getPath().lastIndexOf("/") > -1) ? (loc.getPath().lastIndexOf("/") + 1) : 0,
-                                (loc.getPath().indexOf("#") > -1) ? loc.getPath().indexOf("#") : loc.getPath().length()
-                        )
-                );
+                final String path = loc.getPath();
+                final int start = (path.lastIndexOf('/') > -1) ? path.lastIndexOf('/') + 1 : 0;
+                final int end   = (path.indexOf('#') > -1) ? path.indexOf('#') : path.length();
+                loc = new ResourceLocation(loc.getNamespace(), path.substring(start, end));
 
-                // FIX: passer un ResourceLocation directement, pas un Object
                 final BlockPokedoll pokedoll = (BlockPokedoll) Block.REGISTRY.getObject(loc);
-
-                final PokedollModel model = new PokedollModel(pokedoll);
-                return model;
+                return new PokedollModel(pokedoll);
             }
 
             @Override
@@ -59,12 +53,10 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void postinit(final FMLPostInitializationEvent e) {
+    public void postinit(final net.minecraftforge.fml.common.event.FMLPostInitializationEvent e) {
         super.postinit(e);
-        ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityPokedoll.class,
-                new RenderTileEntityPokedoll()
-        );
+        // ✅ on attache NOTRE renderer (plus de réflexion/bridge Pixelmon)
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPokedoll.class, new RenderTileEntityPokedoll());
     }
 
     @Override
