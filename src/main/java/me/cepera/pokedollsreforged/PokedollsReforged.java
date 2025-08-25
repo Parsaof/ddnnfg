@@ -20,22 +20,22 @@ public class PokedollsReforged
     private Logger logger;
     @SidedProxy(clientSide = "me.cepera.pokedollsreforged.proxy.ClientProxy", serverSide = "me.cepera.pokedollsreforged.proxy.CommonProxy")
     public static CommonProxy PROXY;
-    
+
     public Logger getLogger() {
         return this.logger;
     }
-    
+
     @Mod.EventHandler
     private void preinit(final FMLPreInitializationEvent e) {
         this.logger = e.getModLog();
         PokedollsReforged.PROXY.preinit(e);
     }
-    
+
     @Mod.EventHandler
     private void init(final FMLInitializationEvent e) {
         PokedollsReforged.PROXY.init(e);
     }
-    
+
     @Mod.EventHandler
     private void postinit(final FMLPostInitializationEvent e) {
         PokedollsReforged.PROXY.postinit(e);

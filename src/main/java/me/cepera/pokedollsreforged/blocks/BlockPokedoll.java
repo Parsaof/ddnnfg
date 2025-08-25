@@ -18,7 +18,7 @@ public class BlockPokedoll extends GenericRotatableModelBlock
 {
     private EnumSpecies pokemon;
     private boolean shiny;
-    
+
     public BlockPokedoll(final EnumSpecies pokemon, final boolean shiny) {
         super(Material.CLOTH);
         this.setSoundType(SoundType.CLOTH);
@@ -28,23 +28,23 @@ public class BlockPokedoll extends GenericRotatableModelBlock
         this.pokemon = pokemon;
         this.shiny = shiny;
     }
-    
+
     public EnumSpecies getPokemon() {
         return this.pokemon;
     }
-    
+
     public boolean isShiny() {
         return this.shiny;
     }
-    
+
     public boolean isOpaqueCube(final IBlockState state) {
         return false;
     }
-    
+
     public boolean isFullCube(final IBlockState state) {
         return false;
     }
-    
+
     public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new TileEntityPokedoll(this.pokemon, this.shiny);
     }

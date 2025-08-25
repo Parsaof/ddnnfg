@@ -17,11 +17,11 @@ import net.minecraftforge.fml.common.event.*;
 public class CommonProxy
 {
     public final CreativeTabs creativeTab;
-    
+
     public CommonProxy() {
         this.creativeTab = new CreativeTabs("pokedolls") {
             ItemStack icon;
-            
+
             public ItemStack createIcon() {
                 if (this.icon == null) {
                     final Random r = new Random();
@@ -31,18 +31,18 @@ public class CommonProxy
             }
         };
     }
-    
+
     public void preinit(final FMLPreInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register((Object)new RegistryListener());
         TileEntity.register("pokedollsreforged:pokedoll", (Class)TileEntityPokedoll.class);
     }
-    
+
     public void init(final FMLInitializationEvent e) {
     }
-    
+
     public void postinit(final FMLPostInitializationEvent e) {
     }
-    
+
     public void registerPokedollItemModels() {
     }
 }

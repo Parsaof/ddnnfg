@@ -17,7 +17,7 @@ import java.util.*;
 public class RegistryListener
 {
     public static List<BlockPokedoll> pokedolls;
-    
+
     @SubscribeEvent
     public void registerBlocks(final RegistryEvent.Register<Block> event) {
         this.registerBothPokedolls(EnumSpecies.Azurill);
@@ -98,18 +98,18 @@ public class RegistryListener
         this.registerBothPokedolls(EnumSpecies.Zapdos);
         PokedollsReforged.PROXY.registerPokedollItemModels();
     }
-    
+
     private void registerBothPokedolls(final EnumSpecies pokemon) {
         this.registerPokedoll(pokemon, false);
         this.registerPokedoll(pokemon, true);
     }
-    
+
     private void registerPokedoll(final EnumSpecies pokemon, final boolean isShiny) {
         final BlockPokedoll pokedoll = new BlockPokedoll(pokemon, isShiny);
         PixelmonBlocks.registerBlock((Block)pokedoll, (Class)ItemPokedoll.class, (isShiny ? "shiny" : "") + "pokedoll_" + pokemon.name.toLowerCase());
         RegistryListener.pokedolls.add(pokedoll);
     }
-    
+
     static {
         RegistryListener.pokedolls = new ArrayList<BlockPokedoll>();
     }

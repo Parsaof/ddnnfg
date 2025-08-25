@@ -15,7 +15,7 @@ public class RenderTileEntityPokedoll extends TileEntityRenderer<TileEntityPoked
         super.scale = 0.7f;
         super.disableCulling = true;
     }
-    
+
     public void renderTileEntity(final TileEntityPokedoll te, final IBlockState state, final double x, final double y, final double z, final float partialTicks, final int destroyStage) {
         this.bindTexture(te.getTexture());
         te.getModel().getModel().render((Entity)null, 0.0f, 0.0f, -0.1f, 0.0f, 0.0f, 1.0f);

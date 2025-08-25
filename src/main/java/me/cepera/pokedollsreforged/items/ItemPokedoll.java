@@ -12,12 +12,12 @@ import net.minecraft.util.text.translation.*;
 public class ItemPokedoll extends ItemBlock
 {
     private BlockPokedoll pokedoll;
-    
+
     public ItemPokedoll(final Block block) {
         super(block);
         this.pokedoll = (BlockPokedoll)block;
     }
-    
+
     public String getItemStackDisplayName(final ItemStack stack) {
         return I18n.translateToLocalFormatted(this.pokedoll.isShiny() ? "item.shinypokedoll.name" : "item.pokedoll.name", new Object[] { I18n.translateToLocal("pixelmon." + this.pokedoll.getPokemon().name.toLowerCase() + ".name") });
     }
