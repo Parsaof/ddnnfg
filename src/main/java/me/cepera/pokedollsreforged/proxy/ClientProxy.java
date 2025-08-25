@@ -1,6 +1,3 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "1.12 stable mappings".
-//Decompiled by Procyon!
-
 package me.cepera.pokedollsreforged.proxy;
 
 import net.minecraft.client.resources.IResourceManager;
@@ -10,7 +7,7 @@ import net.minecraft.block.Block;
 import me.cepera.pokedollsreforged.render.PokedollModel;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import me.cepera.pokedollsreforged.tiles.TileEntityPokedoll;
-import me.cepera.pokedollsreforged.render.RenderTileEntityPokedoll; // ✅ notre TESR direct
+import me.cepera.pokedollsreforged.render.RenderTileEntityPokedoll;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import me.cepera.pokedollsreforged.listeners.RegistryListener;
 import net.minecraft.item.Item;
@@ -35,19 +32,27 @@ public class ClientProxy extends CommonProxy {
             public IModel loadModel(final ResourceLocation modelLocation) throws Exception {
                 ResourceLocation loc = modelLocation;
                 final String path = loc.getPath();
-                final int start = (path.lastIndexOf('/') > -1) ? path.lastIndexOf('/') + 1 : 0;
-                final int end   = (path.indexOf('#') > -1) ? path.indexOf('#') : path.length();
-                loc = new ResourceLocation(loc.getNamespace(), path.substring(start, end));
 
-                final BlockPokedoll pokedoll = (BlockPokedoll) Block.REGISTRY.getObject(loc);
-                return new PokedollModel(pokedoll);
+                // Vérifie si c'est un item de pokedoll (custom ou Pokémon)
+                if (path.contains("pokedoll_") || path.contains("custom_")) {
+                    final int start = (path.lastIndexOf('/') > -1) ? path.lastIndexOf('/') + 1 : 0;
+                    final int end   = (path.indexOf('#') > -1) ? path.indexOf('#') : path.length();
+                    loc = new ResourceLocation(loc.getNamespace(), path.substring(start, end));
+
+                    final BlockPokedoll pokedoll = (BlockPokedoll) Block.REGISTRY.getObject(loc);
+                    if (pokedoll != null) {
+                        return new PokedollModel(pokedoll);
+                    }
+                }
+                return ModelLoaderRegistry.getMissingModel();
             }
 
             @Override
             public boolean accepts(final ResourceLocation modelLocation) {
-                return modelLocation.getNamespace().equals("pokedollsreforged")
-                        && modelLocation.getPath().contains("pokedoll_")
-                        && !modelLocation.getPath().contains("models/item/");
+                return modelLocation.getNamespace().equals("pokedollsreforged") &&
+                        (modelLocation.getPath().contains("pokedoll_") ||
+                                modelLocation.getPath().contains("custom_")) &&
+                        !modelLocation.getPath().contains("models/item/");
             }
         });
     }

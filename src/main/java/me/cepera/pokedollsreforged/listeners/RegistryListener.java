@@ -1,25 +1,22 @@
-//Deobfuscated with https://github.com/SimplyProgrammer/Minecraft-Deobfuscator3000 using mappings "C:\Users\thoma\OneDrive\Documents\Minecraft-Deobfuscator3000-master\1.12 stable mappings"!
-
-//Decompiled by Procyon!
-
 package me.cepera.pokedollsreforged.listeners;
 
-import me.cepera.pokedollsreforged.blocks.*;
-import net.minecraftforge.event.*;
-import net.minecraft.block.*;
-import com.pixelmonmod.pixelmon.enums.*;
-import me.cepera.pokedollsreforged.*;
-import net.minecraftforge.fml.common.eventhandler.*;
-import me.cepera.pokedollsreforged.items.*;
-import com.pixelmonmod.pixelmon.config.*;
-import java.util.*;
+import me.cepera.pokedollsreforged.blocks.BlockPokedoll;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.block.Block;
+import com.pixelmonmod.pixelmon.enums.EnumSpecies;
+import me.cepera.pokedollsreforged.PokedollsReforged;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import me.cepera.pokedollsreforged.items.ItemPokedoll;
+import com.pixelmonmod.pixelmon.config.PixelmonBlocks;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RegistryListener
-{
+public class RegistryListener {
     public static List<BlockPokedoll> pokedolls;
 
     @SubscribeEvent
-    public void registerBlocks(final RegistryEvent.Register<Block> event) {
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        // Enregistrement des Pokémon existants
         this.registerBothPokedolls(EnumSpecies.Azurill);
         this.registerBothPokedolls(EnumSpecies.Baltoy);
         this.registerBothPokedolls(EnumSpecies.Blastoise);
@@ -96,17 +93,27 @@ public class RegistryListener
         this.registerBothPokedolls(EnumSpecies.Regigigas);
         this.registerBothPokedolls(EnumSpecies.Uxie);
         this.registerBothPokedolls(EnumSpecies.Zapdos);
+
+        // Enregistrement des blocs custom
+        this.registerCustomBlock(BlockPokedoll.BlockCustom.SEWING_MACHINE);
+
         PokedollsReforged.PROXY.registerPokedollItemModels();
     }
 
-    private void registerBothPokedolls(final EnumSpecies pokemon) {
+    private void registerBothPokedolls(EnumSpecies pokemon) {
         this.registerPokedoll(pokemon, false);
         this.registerPokedoll(pokemon, true);
     }
 
-    private void registerPokedoll(final EnumSpecies pokemon, final boolean isShiny) {
-        final BlockPokedoll pokedoll = new BlockPokedoll(pokemon, isShiny);
-        PixelmonBlocks.registerBlock((Block)pokedoll, (Class)ItemPokedoll.class, (isShiny ? "shiny" : "") + "pokedoll_" + pokemon.name.toLowerCase());
+    private void registerPokedoll(EnumSpecies pokemon, boolean isShiny) {
+        BlockPokedoll pokedoll = new BlockPokedoll(pokemon, isShiny);
+        PixelmonBlocks.registerBlock(pokedoll, ItemPokedoll.class, (isShiny ? "shiny" : "") + "pokedoll_" + pokemon.name.toLowerCase());
+        RegistryListener.pokedolls.add(pokedoll);
+    }
+
+    private void registerCustomBlock(BlockPokedoll.BlockCustom customBlock) {
+        BlockPokedoll pokedoll = new BlockPokedoll(customBlock);
+        PixelmonBlocks.registerBlock(pokedoll, ItemPokedoll.class, "custom_" + customBlock.getName());
         RegistryListener.pokedolls.add(pokedoll);
     }
 
